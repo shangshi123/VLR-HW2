@@ -27,7 +27,7 @@ class UpSampleConv2D(torch.jit.ScriptModule):
         # (batch, channel, height*upscale_factor, width*upscale_factor)
         # 3. Apply convolution and return output
         ##################################################################
-        pass
+        return 0
         ##################################################################
         #                          END OF YOUR CODE                      #
         ##################################################################
