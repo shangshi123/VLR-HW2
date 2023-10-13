@@ -28,7 +28,7 @@ class UpSampleConv2D(torch.jit.ScriptModule):
         # (batch, channel, height*upscale_factor, width*upscale_factor)
         # 3. Apply convolution and return output
         ##################################################################
-        x = torch.repeat_interleave(x,self.upscale_factor**2,dim = 1)
+        x = torch.repeat_interleave(x,int(self.upscale_factor**2),dim = 1)
         x = self.shuffle(x)
         x = self.conv(x)
         return x
@@ -60,8 +60,9 @@ class DownSampleConv2D(torch.jit.ScriptModule):
         ##################################################################
         x = self.unshuffle(x)
         B, C, H, W = x.size()
-        x = torch.reshape(x,(self.downscale_ratio**2,B,-1,H,W))
+        x = torch.reshape(x,(int(self.downscale_ratio**2),B,-1,H,W))
         x = torch.mean(x, dim = 0)
+        x = self.conv(x)
         return x
 
         
@@ -142,8 +143,8 @@ class ResBlockDown(torch.jit.ScriptModule):
         ##################################################################
         # TODO 1.1: Setup the network layers
         ##################################################################
-        self.downsample = DownSampleConv2D(n_filters, kerrnel_sie = kernel_size,n_filters = n_filters,padding= 1)
-        self.downsample_res = DownSampleConv2D(input_channels, 1,n_filters,padding= 1)
+        self.downsample = DownSampleConv2D(n_filters, kernel_size = kernel_size,n_filters = n_filters,padding= 1)
+        self.downsample_res = DownSampleConv2D(input_channels=input_channels, kernel_size = 1,n_filters = n_filters)
         self.layers = nn.Sequential(
             nn.ReLU(),
             nn.Conv2d(input_channels, n_filters, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
@@ -161,7 +162,13 @@ class ResBlockDown(torch.jit.ScriptModule):
         # connection. Make sure to downsample the residual before adding
         # it to the layer output.
         ##################################################################
+        out1 = self.layers(x)
+        res = self.downsample_res(x)
+        # print(x.size())
+        # print(out1.size())
+        # print(res.size())
         x = self.layers(x) + self.downsample_res(x)
+        return x
         ##################################################################
         #                          END OF YOUR CODE                      #
         ##################################################################
@@ -309,7 +316,7 @@ class Generator(torch.jit.ScriptModule):
         mean = torch.zeros(n_samples,128)
         std = torch.ones(n_samples,128)
         samples = torch.normal(mean,std)
-        out = self.forward_given_samples(samples)
+        out = self.forward_given_samples(samples.cuda())
         return out
         ##################################################################
         #                          END OF YOUR CODE                      #

@@ -28,8 +28,8 @@ def get_optimizers_and_schedulers(gen, disc):
     # The learning rate for the generator should be decayed to 0 over
     # 100K iterations.
     ##################################################################
-    scheduler_discriminator = torch.optim.lr_scheduler.CosineAnnealingLRCosineAnnealing(optim_discriminator,T_max = 500000)
-    scheduler_generator = torch.optim.lr_scheduler.CosineAnnealingLRCosineAnnealing(optim_generator,T_max = 100000)
+    scheduler_discriminator = torch.optim.lr_scheduler.CosineAnnealingLR(optim_discriminator,T_max = 500000)
+    scheduler_generator = torch.optim.lr_scheduler.CosineAnnealingLR(optim_generator,T_max = 100000)
     ##################################################################
     #                          END OF YOUR CODE                      #
     ##################################################################
@@ -105,9 +105,11 @@ def train_model(
                 # 2. Compute discriminator output on the train batch.
                 # 3. Compute the discriminator output on the generated data.
                 ##################################################################
-                gen_out = gen(batch_size).cuda()
+                B = train_batch.size(dim=0)
+                gen_out = gen(B).cuda()
                 discrim_real = disc(train_batch).cuda()
                 discrim_fake = disc(gen_out).cuda()
+                # print(train_batch.size())
                 ##################################################################
                 #                          END OF YOUR CODE                      #
                 ##################################################################
@@ -138,12 +140,12 @@ def train_model(
                     # generated data.
                     ###################################################################
                     fake_batch = gen(batch_size).cuda()
-                    discrim_fake = discrim_fake = disc(gen_out).cuda()
+                    discr_fake = disc(fake_batch).cuda()
                     ##################################################################
                     #                          END OF YOUR CODE                      #
                     ##################################################################
 
-                    generator_loss = gen_loss_fn(discrim_fake)
+                    generator_loss = gen_loss_fn(discr_fake)
 
                 optim_generator.zero_grad(set_to_none=True)
                 scaler.scale(generator_loss).backward()
@@ -157,11 +159,13 @@ def train_model(
                         # TODO 1.2: Generate samples using the generator.
                         # Make sure they lie in the range [0, 1]!
                         ##################################################################
-                        num_samples = 10
-                        generated_samples = gen().cuda()
+                        num_samples = 100
+                        generated_samples = gen(num_samples).cuda()
+                        B,C,H,W = generated_samples.size()
                         generated_samples = generated_samples.view(num_samples,-1)
-                        generated_samples -= generated_samples.min(1)
-                        generated_samples /= generated_samples.max(1)
+                        generated_samples -= generated_samples.min(1,keepdim = True)[0]
+                        generated_samples /= generated_samples.max(1,keepdim = True)[0]
+                        generated_samples = generated_samples.view(num_samples,C,H,W)
                         ##################################################################
                         #                          END OF YOUR CODE                      #
                         ##################################################################

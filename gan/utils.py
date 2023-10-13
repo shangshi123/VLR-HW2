@@ -47,9 +47,9 @@ def interpolate_latent_space(gen, path):
     y = y.flatten()
     first_2 = torch.vstack((x,y)).T
     zeros = torch.zeros(100,126)
-    latent = torch.hstack((first_2,zeros))
+    latent = torch.hstack((first_2,zeros)).cuda()
     output = gen.forward_given_samples(latent)
-    torchvision.utils.save_image(output,path)
+    torchvision.utils.save_image(output,path,nrow=10)
 
     ##################################################################
     #                          END OF YOUR CODE                      #
