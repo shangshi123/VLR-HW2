@@ -33,8 +33,8 @@ def compute_generator_loss(discrim_fake):
     # TODO 1.3: Implement GAN loss for the generator.
     ##################################################################
     B = discrim_fake.size(dim = 0)
-    fake_label = torch.zeros(B,1).cuda()
-    loss = torch.nn.BCEWithLogitsLoss(1-discrim_fake,fake_label)
+    real_label = torch.ones(B,1).cuda()
+    loss = torch.nn.BCEWithLogitsLoss(discrim_fake,real_label)
     ##################################################################
     #                          END OF YOUR CODE                      #
     ##################################################################
