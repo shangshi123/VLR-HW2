@@ -20,7 +20,7 @@ def ae_loss(model, x):
     ##################################################################
     enc = model.encoder(x)
     gen = model.decoder(enc)
-    loss = torch.nn.MSELoss(gen,x,reducton = "sum")
+    loss = torch.nn.MSELoss(gen,x,reduction = "sum")
     loss /= x.size(dim=0)
     ##################################################################
     #                          END OF YOUR CODE                      #
