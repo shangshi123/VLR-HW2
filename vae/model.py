@@ -46,7 +46,7 @@ class Encoder(nn.Module):
         # of dimension == self.latent_dim
         ##################################################################
         x = self.convs(x)
-        x = x.view(-1, 256*self.H_out*self.W_out)
+        x = x.view(-1, 256*4*4)
         out = self.fc(x)
         return out
         ##################################################################
