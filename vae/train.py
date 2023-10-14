@@ -18,7 +18,8 @@ def ae_loss(model, x):
     ##################################################################
     # TODO 2.2: Fill in MSE loss between x and its reconstruction.
     ##################################################################
-    gen = model(x)
+    enc = model.encoder(x)
+    gen = model.decoder(enc)
     loss = torch.nn.MSELoss(gen,x,reducton = "sum")
     loss /= x.size(dim=0)
     ##################################################################
