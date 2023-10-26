@@ -18,10 +18,11 @@ def compute_discriminator_loss(
     # for Q1.5.
     ##################################################################
     B = discrim_real.size(dim = 0)
+    criterion = torch.nn.BCEWithLogitsLoss()
     real_label = torch.ones(B,1).cuda()
     fake_label = torch.zeros(B,1).cuda()
-    loss1 = torch.nn.BCEWithLogitsLoss(discrim_real,real_label)
-    loss2 = torch.nn.BCEWithLogitsLoss(discrim_fake,fake_label)
+    loss1 = criterion(discrim_real,real_label)
+    loss2 = criterion(discrim_fake,fake_label)
     ##################################################################
     #                          END OF YOUR CODE                      #
     ##################################################################
@@ -32,9 +33,10 @@ def compute_generator_loss(discrim_fake):
     ##################################################################
     # TODO 1.3: Implement GAN loss for the generator.
     ##################################################################
+    criterion = torch.nn.BCEWithLogitsLoss()
     B = discrim_fake.size(dim = 0)
     real_label = torch.ones(B,1).cuda()
-    loss = torch.nn.BCEWithLogitsLoss(discrim_fake,real_label)
+    loss = criterion(discrim_fake,real_label)
     ##################################################################
     #                          END OF YOUR CODE                      #
     ##################################################################

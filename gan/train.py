@@ -109,7 +109,6 @@ def train_model(
                 gen_out = gen(B).cuda()
                 discrim_real = disc(train_batch).cuda()
                 discrim_fake = disc(gen_out).cuda()
-                # print(train_batch.size())
                 ##################################################################
                 #                          END OF YOUR CODE                      #
                 ##################################################################
@@ -118,8 +117,9 @@ def train_model(
                 # TODO 1.5 Compute the interpolated batch and run the
                 # discriminator on it.
                 ###################################################################
-                interp = None
-                discrim_interp = None
+                eps = torch.rand((train_batch.size(dim = 0),1,1,1)).cuda()
+                interp = eps*train_batch + (1-eps)*gen_out
+                discrim_interp = disc(interp).cuda()
                 ##################################################################
                 #                          END OF YOUR CODE                      #
                 ##################################################################
@@ -132,7 +132,6 @@ def train_model(
             scaler.scale(discriminator_loss).backward()
             scaler.step(optim_discriminator)
             scheduler_discriminator.step()
-
             if iters % 5 == 0:
                 with torch.cuda.amp.autocast(enabled=amp_enabled):
                     ##################################################################

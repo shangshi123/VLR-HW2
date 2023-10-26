@@ -49,7 +49,13 @@ def interpolate_latent_space(gen, path):
     zeros = torch.zeros(100,126)
     latent = torch.hstack((first_2,zeros)).cuda()
     output = gen.forward_given_samples(latent)
+    B,C,H,W = output.size()
+    output = output.view(100,-1)
+    output -= output.min(1,keepdim = True)[0]
+    output /= output.max(1,keepdim = True)[0]
+    output = output.view(B,C,H,W)
     torchvision.utils.save_image(output,path,nrow=10)
+
 
     ##################################################################
     #                          END OF YOUR CODE                      #

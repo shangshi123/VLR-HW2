@@ -19,7 +19,7 @@ def compute_discriminator_loss(
     B = discrim_real.size(dim = 0)
     real_label = torch.ones(B,1).cuda()
     fake_label = torch.zeros(B,1).cuda()
-    loss = 0.5 (torch.mean((discrim_real-real_label)**2) + torch.mean((discrim_fake-fake_label)**2))
+    loss = 0.5*(torch.mean((discrim_real-real_label)**2) + torch.mean((discrim_fake-fake_label)**2))
     ##################################################################
     #                          END OF YOUR CODE                      #
     ##################################################################
@@ -32,7 +32,7 @@ def compute_generator_loss(discrim_fake):
     ##################################################################
     B = discrim_fake.size(dim = 0)
     real_label = torch.ones(B,1).cuda()
-    loss = 0.5*(torch.mean((discrim_fake,real_label)**2))
+    loss = 0.5*(torch.mean((discrim_fake-real_label)**2))
     ##################################################################
     #                          END OF YOUR CODE                      #
     ##################################################################

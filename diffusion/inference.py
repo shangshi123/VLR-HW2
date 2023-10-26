@@ -14,7 +14,15 @@ def get_fid(gen, dataset_name, dataset_resolution, z_dimension, batch_size, num_
     # diffusion model given z
     # Note: The output must be in the range [0, 255]!
     ##################################################################
-    gen_fn = None
+    def gen_function(z):
+        shape= (batch_size, gen.channels, dataset_resolution, dataset_resolution)
+        samples = gen.sample_given_z(z, shape)
+        samples = samples.reshape(batch_size,gen.channels,-1)
+        samples = (samples - samples.min(dim=2,keepdim = True)[0]) / (samples.max(dim=2,keepdim = True)[0] - samples.min(dim=2,keepdim = True)[0])
+        samples *= 255
+        samples = samples.reshape(*shape)
+        return samples
+    gen_fn = gen_function
     ##################################################################
     #                          END OF YOUR CODE                      #
     ##################################################################
@@ -47,6 +55,10 @@ if __name__ == "__main__":
 
     sampling_timesteps = args.ddim_timesteps if args.sampling_method == "ddim" else None
 
+    # model = Unet(
+    #     dim=64,
+    #     dim_mults=(1, 2, 4, 8)
+    # ).cpu()
     model = Unet(
         dim=64,
         dim_mults=(1, 2, 4, 8)
@@ -57,6 +69,12 @@ if __name__ == "__main__":
         sampling_timesteps=sampling_timesteps,
         ddim_sampling_eta=args.ddim_eta,
     ).cuda()
+    # diffusion = DiffusionModel(
+    #     model,
+    #     timesteps=1000,   # number of timesteps
+    #     sampling_timesteps=sampling_timesteps,
+    #     ddim_sampling_eta=args.ddim_eta,
+    # ).cpu()
 
     img_shape = (args.num_images, diffusion.channels, args.image_size, args.image_size)
 

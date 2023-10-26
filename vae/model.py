@@ -33,8 +33,6 @@ class Encoder(nn.Module):
             nn.ReLU(),
             nn.Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
         )
-        H = input_shape[-2]
-        W = input_shape[-1]
         self.fc = nn.Linear(256*4*4,self.latent_dim)
         ##################################################################
         #                          END OF YOUR CODE                      #
@@ -60,7 +58,7 @@ class VAEEncoder(Encoder):
         # TODO 2.4: Fill in self.fc, such that output dimension is
         # 2*self.latent_dim
         ##################################################################
-        self.fc = None
+        self.fc = nn.Linear(3*32*32,2*self.latent_dim)
         ##################################################################
         #                          END OF YOUR CODE                      #
         ##################################################################
@@ -70,12 +68,14 @@ class VAEEncoder(Encoder):
         # TODO 2.1: Forward pass through the network, should return a
         # tuple of 2 tensors, mu and log_std
         ##################################################################
-        mu = None
-        log_std = None
+        x = x.view(-1,3*32*32)
+        x = self.fc(x)
+        mu = x[:,:self.latent_dim]
+        log_var = x[:,self.latent_dim:]
         ##################################################################
         #                          END OF YOUR CODE                      #
         ##################################################################
-        return mu, log_std
+        return mu, log_var
 
 
 class Decoder(nn.Module):
